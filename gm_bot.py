@@ -22,6 +22,7 @@ if __version_info__ < (20, 0, 0, "alpha", 1):
     )
 from telegram import Bot
 
+
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
