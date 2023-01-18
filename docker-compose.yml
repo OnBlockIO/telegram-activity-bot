@@ -1,0 +1,8 @@
+version: '3.7'
+services:
+  discord-activity-bot:
+    image: master/onblock.TelegramStats.py:latest
+    restart: always
+    environment:
+      BOT_TOKEN: "OTUxMDczNjQyMDgxNTYyNjY3.YiiKWg._OWCoWB2V_EFx6gve_FIeQDYPas"
+      CHANNEL_ID: -1001833225803

@@ -1,0 +1,26 @@
+name: CI/main
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+on:
+  push:
+    branches:
+      - "master"
+    paths-ignore:
+      - "**/README.md"
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    name: Integrate
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+      - name: Build and publish OnBlock.TelegramStats.py to registry
+        uses: aevea/action-kaniko@master
+        with:
+          registry: ghcr.io
+          password: ${{ secrets.GITHUB_TOKEN }}
+          path: ./
+          build_file: ./Dockerfile
+          image: master/onblock.TelegramStats.py
