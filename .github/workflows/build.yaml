@@ -23,4 +23,4 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           path: ./
           build_file: ./Dockerfile
-          image: master/onblock.TelegramStats.py
+          image: master/onblock.telegram-stats.py
