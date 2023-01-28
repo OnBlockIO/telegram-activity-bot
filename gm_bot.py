@@ -93,8 +93,9 @@ def _get_asset_id(chain, contract, token_id):
 def _get_asset_attributes(asset_id):
     url = GM_ATTR_URL.format(asset_id, ATTRIBUTES_TO_SHOW)
     res = requests.get(url, verify=False).json()
-    res = [x for x in res["attributes"] if x['key'].get('displayName')]
-    return res
+    attributes = res.get("attributes", []) if res.get("attributes") else []
+    attributes = [x for x in attributes if x['key'].get('displayName')]
+    return attributes
 
 
 def get_gm_events_from_last_time(base_url, last_time, event_name, action_name):
@@ -128,7 +129,7 @@ def get_gm_events_from_last_time(base_url, last_time, event_name, action_name):
         if event.get('metadata') is not None:
             token_id = event['tokenId']
             nft_name = event['metadata']['name']
-            nft_url = f"https://ghostmarket.io/asset/{chain}/{contract}/{token_id}"
+            nft_url = f"https://ghostmarket.io/asset/{chain}/{contract}/{token_id}/"
             mint_num = event['metadata']['mintNumber']
             mint_max = event['series']['maxSupply']
             asset_id = _get_asset_id(chain, contract, token_id)
@@ -148,7 +149,7 @@ def get_gm_events_from_last_time(base_url, last_time, event_name, action_name):
                     description = f'<a href="{nft_url}">{nft_name}</a>\n{action_name} by <b>{user}</b>\nFor <b>{price} {currency}</b> (${price_usd})'
         else:
             nft_name = "Collection offer"
-            nft_url = f"https://ghostmarket.io/collection/{collection_slug}"
+            nft_url = f"https://ghostmarket.io/collection/{collection_slug}/"
             description = f'<a href="{nft_url}">{nft_name}</a>\n{action_name} by <b>{user}</b>\nFor <b>{price} {currency}</b> (${price_usd})'
 
         message = f"<b>New {event_name}: {chain_name} {collection} NFT</b>\n{description}"
