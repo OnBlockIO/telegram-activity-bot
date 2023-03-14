@@ -34,10 +34,10 @@ BOT_TOKEN = os.environ.get("BOT_TOKEN")
 CHANNEL_ID = os.environ.get("CHANNEL_ID")
 CHAIN_FILTER = os.environ.get("CHAIN_FILTER", "")
 COLLECTION_FILTER = os.environ.get("COLLECTION_FILTER", "")
-GM_SALES_URL = "https://api.ghostmarket.io/api/v2/events?page=1&size=100&DateFrom={}&DateTill={}&orderBy=date&orderDirection=desc&getTotal=true&localCurrency=USD&chain=&grouping=true&eventKind=orderfilled&onlyVerified=false&showBurned=false&nftName=&showBlacklisted=false&showNsfw=false&chain={}&collection={}"
-GM_OFFERS_URL = "https://api.ghostmarket.io/api/v2/events?page=1&size=100&DateFrom={}&DateTill={}&orderBy=date&orderDirection=desc&getTotal=true&localCurrency=USD&chain=&grouping=true&eventKind=offercreated&onlyVerified=false&showBurned=false&nftName=&showBlacklisted=false&showNsfw=false&chain={}&collection={}"
-GM_BIDS_URL = "https://api.ghostmarket.io/api/v2/events?page=1&size=100&DateFrom={}&DateTill={}&orderBy=date&orderDirection=desc&getTotal=true&localCurrency=USD&chain=&grouping=true&eventKind=orderbid&onlyVerified=false&showBurned=false&nftName=&showBlacklisted=false&showNsfw=false&chain={}&collection={}"
-GM_LISTINGS_URL = "https://api.ghostmarket.io/api/v2/events?page=1&size=100&DateFrom={}&DateTill={}&orderBy=date&orderDirection=desc&getTotal=true&localCurrency=USD&chain=&grouping=true&eventKind=ordercreated&onlyVerified=false&showBurned=false&nftName=&showBlacklisted=false&showNsfw=false&chain={}&collection={}"
+GM_SALES_URL = "https://api.ghostmarket.io/api/v2/events?page=1&size=100&DateFrom={}&DateTill={}&orderBy=date&orderDirection=desc&getTotal=true&localCurrency=USD&chain=&grouping=true&eventKind=orderfilled&onlyVerified=false&showBurned=false&nftName=&showBlacklisted=false&showNsfw=false&chain={}&collection={}&platforms[]=ghostmarket"
+GM_OFFERS_URL = "https://api.ghostmarket.io/api/v2/events?page=1&size=100&DateFrom={}&DateTill={}&orderBy=date&orderDirection=desc&getTotal=true&localCurrency=USD&chain=&grouping=true&eventKind=offercreated&onlyVerified=false&showBurned=false&nftName=&showBlacklisted=false&showNsfw=false&chain={}&collection={}&platforms[]=ghostmarket"
+GM_BIDS_URL = "https://api.ghostmarket.io/api/v2/events?page=1&size=100&DateFrom={}&DateTill={}&orderBy=date&orderDirection=desc&getTotal=true&localCurrency=USD&chain=&grouping=true&eventKind=orderbid&onlyVerified=false&showBurned=false&nftName=&showBlacklisted=false&showNsfw=false&chain={}&collection={}&platforms[]=ghostmarket"
+GM_LISTINGS_URL = "https://api.ghostmarket.io/api/v2/events?page=1&size=100&DateFrom={}&DateTill={}&orderBy=date&orderDirection=desc&getTotal=true&localCurrency=USD&chain=&grouping=true&eventKind=ordercreated&onlyVerified=false&showBurned=false&nftName=&showBlacklisted=false&showNsfw=false&chain={}&collection={}&platforms[]=ghostmarket"
 GM_ASSETS_URL = "https://api.ghostmarket.io/api/v2/assets?Chain={}&Contract={}&TokenIds[]={}"
 GM_ATTR_URL = "https://api.ghostmarket.io/api/v2/asset/{}/attributes?page=1&size={}"
 CHAIN_MAPPING = {
@@ -98,14 +98,15 @@ def _get_asset_attributes(asset_id):
     return attributes
 
 
-def get_gm_events_from_last_time(base_url, last_time, event_name, action_name):
-    events = []
+def get_gm_events_from_last_time(base_url, last_time, event_name, action_name, events, cursor):
     max_time_to_get = int(time.time()) - 60
     if max_time_to_get <= last_time:
         return events, last_time
     url = base_url.format(last_time, max_time_to_get, CHAIN_FILTER, COLLECTION_FILTER)
+    if cursor:
+        url += f"Cursor={cursor}"
     res = requests.get(url, verify=False).json()
-    for i, event in enumerate(res["events"] if res["events"] else []):
+    for i, event in enumerate(res.get("events", []) if res.get("events", []) else []):
         if i == 0:
             last_time = event['date'] + 1
         chain = event['contract']['chain']
@@ -158,6 +159,8 @@ def get_gm_events_from_last_time(base_url, last_time, event_name, action_name):
             for attr in attributes:
                 message = f'{message}<b>{attr["key"]["displayName"]}:</b> {attr["value"]["value"]}\n'
         events.append(message)
+    if res.get("next"):
+        return get_gm_events_from_last_time(base_url, last_time, event_name, action_name, events, res.get("next"))
     return events, last_time
 
 
@@ -171,7 +174,8 @@ async def main() -> NoReturn:
         last_listings_time = int(time.time())
         while True:
             try:
-                sales, last_sales_time = get_gm_events_from_last_time(GM_SALES_URL, last_sales_time, "sale", "Bought")
+                sales, last_sales_time = get_gm_events_from_last_time(GM_SALES_URL, last_sales_time, "sale", "Bought",
+                                                                      [], None)
                 for sale in sales[::-1]:
                     await bot.send_message(CHANNEL_ID, sale, parse_mode="HTML", write_timeout=100, read_timeout=100, connect_timeout=100, pool_timeout=100)
             except:
@@ -179,7 +183,7 @@ async def main() -> NoReturn:
                 print("Error retrieving last sales")
             try:
                 listings, last_listings_time = get_gm_events_from_last_time(GM_LISTINGS_URL, last_listings_time,
-                                                                            "listing", "Offered")
+                                                                            "listing", "Offered", [], None)
                 for listing in listings[::-1]:
                     await bot.send_message(CHANNEL_ID, listing, parse_mode="HTML", write_timeout=100, read_timeout=100, connect_timeout=100, pool_timeout=100)
             except:
@@ -187,14 +191,14 @@ async def main() -> NoReturn:
                 print("Error retrieving last listings")
             try:
                 offers, last_offers_time = get_gm_events_from_last_time(GM_OFFERS_URL, last_offers_time, "offer",
-                                                                        "Offer")
+                                                                        "Offer", [], None)
                 for offer in offers[::-1]:
                     await bot.send_message(CHANNEL_ID, offer, parse_mode="HTML", write_timeout=100, read_timeout=100, connect_timeout=100, pool_timeout=100)
             except:
                 last_offers_time = int(time.time())
                 print("Error retrieving last offers")
             try:
-                bids, last_bids_time = get_gm_events_from_last_time(GM_BIDS_URL, last_bids_time, "bid", "Bid")
+                bids, last_bids_time = get_gm_events_from_last_time(GM_BIDS_URL, last_bids_time, "bid", "Bid", [], None)
                 for bid in bids[::-1]:
                     await bot.send_message(CHANNEL_ID, bid, parse_mode="HTML", write_timeout=100, read_timeout=100, connect_timeout=100, pool_timeout=100)
             except:
