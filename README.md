@@ -17,7 +17,8 @@ For a chain use one of those options on `CHAIN_FILTER` environment variable:
 * "n3": "N3",  
 * "polygon": "Polygon",  
 * "avalanche": "Avalanche",  
-* "eth": "Ethereum"
+* "eth": "Ethereum",  
+* "base": "Base"
 
 For a collection use the slug of your collection (you can see It on the URL when visiting the collection on GhostMarket: for example `bored-doge` for DogeRift NFTS https://ghostmarket.io/collection/bored-doge/) on `COLLECTION_FILTER`.
 
