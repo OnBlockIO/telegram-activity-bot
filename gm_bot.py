@@ -46,7 +46,8 @@ CHAIN_MAPPING = {
     "n3": "N3",
     "polygon": "Polygon",
     "avalanche": "Avalanche",
-    "eth": "Ethereum"
+    "eth": "Ethereum",
+    "base": "Base"
 }
 DECIMALS_MAPPING = {
     "BNB": 18,
