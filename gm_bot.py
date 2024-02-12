@@ -138,14 +138,14 @@ def get_gm_events_from_last_time(base_url, last_time, event_name, action_name, e
             attributes = _get_asset_attributes(asset_id)
             if attributes:
                 if chain == "pha":
-                    mint_part = f"{mint_num} of {mint_max}" if mint_max != 0 else f"{mint_num}"
+                    mint_part = f"{mint_num} of {mint_max}" if str(mint_max) != '0' else f"{mint_num}"
                     description = f'<a href="{nft_url}">{nft_name}</a>\n{action_name} by <b>{user}</b>\nFor <b>{price} {currency}</b> (${price_usd})\nMint <b>{mint_part}</b>\n\n'
                 else:
                     description = f'<a href="{nft_url}">{nft_name}</a>\n{action_name} by <b>{user}</b>\nFor <b>{price} {currency}</b> (${price_usd})\n\n'
             else:
                 attributes = []
                 if chain == "pha":
-                    mint_part = f"{mint_num} of {mint_max}" if mint_max != 0 else f"{mint_num}"
+                    mint_part = f"{mint_num} of {mint_max}" if str(mint_max) != '0' else f"{mint_num}"
                     description = f'<a href="{nft_url}">{nft_name}</a>\n{action_name} by <b>{user}</b>\nFor <b>{price} {currency}</b> (${price_usd})\nMint <b>{mint_part}</b>'
                 else:
                     description = f'<a href="{nft_url}">{nft_name}</a>\n{action_name} by <b>{user}</b>\nFor <b>{price} {currency}</b> (${price_usd})'
