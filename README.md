@@ -1,5 +1,7 @@
 # Telegram Bot for GhostMarket activities
 
+![CI/master](https://github.com/OnBlockIO/telegram-activity-bot/actions/workflows/build.yml/badge.svg?branch=master)
+
 ## How to install?
 - Create a Python environment with dependencies  from `requirements.txt` 
 - Build a Docker image using the `Dockerfile` in this repo
