@@ -1,7 +1,7 @@
-version: '3.7'
+version: '3.9'
 services:
   telegram-activity-bot:
-    image: master/onblock.TelegramStats.py:latest
+    image: master/onblock-telegram-bot.py:latest
     restart: always
     environment:
       BOT_TOKEN: "OTUxMDczNjQyMDgxNTYyNjY3.YiiKWg._OWCoWB2V_EFx6gve_FIeQDYPas"

@@ -16,11 +16,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@master
-      - name: Build and publish OnBlock.TelegramStats.py to registry
+      - name: Build and publish onblock-telegram-bot.py to registry
         uses: aevea/action-kaniko@master
         with:
           registry: ghcr.io
           password: ${{ secrets.GITHUB_TOKEN }}
           path: ./
           build_file: ./Dockerfile
-          image: master/onblock.telegram-stats.py
+          image: master/onblock-telegram-bot.py
