@@ -1,8 +1,6 @@
-version: '3.9'
+version: "3.9"
 services:
-  telegram-activity-bot:
-    image: master/onblock-telegram-bot.py:latest
-    restart: always
-    environment:
-      BOT_TOKEN: "OTUxMDczNjQyMDgxNTYyNjY3.YiiKWg._OWCoWB2V_EFx6gve_FIeQDYPas"
-      CHANNEL_ID: -1001833225803
+  discord_stats:
+    image: telegram_activity_app
+    env_file:
+      - .env
