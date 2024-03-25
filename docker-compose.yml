@@ -1,6 +1,6 @@
 version: "3.9"
 services:
-  discord_stats:
+  telegram-activity-bot:
     image: telegram_activity_app
     env_file:
       - .env
