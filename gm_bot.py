@@ -47,7 +47,8 @@ CHAIN_MAPPING = {
     "polygon": "Polygon",
     "avalanche": "Avalanche",
     "eth": "Ethereum",
-    "base": "Base"
+    "base": "Base",
+    "neox": "Neo X"
 }
 DECIMALS_MAPPING = {
     "BNB": 18,
@@ -80,7 +81,8 @@ DECIMALS_MAPPING = {
     "FUSDT": 6,
     "FUSD": 8,
     "NEX": 8,
-    "NEP": 8
+    "NEP": 8,
+    "WGAS": 18
 }
 ATTRIBUTES_TO_SHOW = 6
 
