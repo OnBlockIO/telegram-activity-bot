@@ -82,7 +82,8 @@ DECIMALS_MAPPING = {
     "FUSD": 8,
     "NEX": 8,
     "NEP": 8,
-    "WGAS": 18
+    "WGAS": 18,
+    "NDMEME": 18
 }
 ATTRIBUTES_TO_SHOW = 6
 
