@@ -4,6 +4,7 @@ import os
 import requests
 import time
 import urllib3
+import urllib.parse as urllib_parse
 
 from typing import NoReturn
 
@@ -133,7 +134,7 @@ def get_gm_events_from_last_time(base_url, last_time, event_name, action_name, e
         contract = event['contract']['hash']
         if event.get('metadata') is not None:
             token_id = event['tokenId']
-            safe_token_id = urllib3.parse.quote_plus(token_id)
+            safe_token_id = urllib_parse.quote_plus(token_id) # safe_token_id = urllib3.parse.quote_plus(token_id)
             nft_name = event['metadata']['name']
             nft_url = f"https://ghostmarket.io/asset/{chain}/{contract}/{safe_token_id}/"
             mint_num = event['metadata']['mintNumber']
@@ -171,6 +172,7 @@ def get_gm_events_from_last_time(base_url, last_time, event_name, action_name, e
 
 async def main() -> NoReturn:
     """Run the bot."""
+    logger.info("Starting bot main loop...")
     # Here we use the `async with` syntax to properly initialize and shutdown resources.
     async with Bot(BOT_TOKEN) as bot:
         last_sales_time = int(time.time())
@@ -181,35 +183,41 @@ async def main() -> NoReturn:
             try:
                 sales, last_sales_time = get_gm_events_from_last_time(GM_SALES_URL, last_sales_time, "sale", "Bought",
                                                                       [], None)
+                logger.info(f"Sales to send: {len(sales)}")
                 for sale in sales[::-1]:
                     await bot.send_message(CHANNEL_ID, sale, parse_mode="HTML", write_timeout=100, read_timeout=100, connect_timeout=100, pool_timeout=100)
-            except:
+            except Exception as err:
                 last_sales_time = int(time.time())
-                print("Error retrieving last sales")
+                logger.error(f"Error retrieving or sending last sales {err}")
             try:
                 listings, last_listings_time = get_gm_events_from_last_time(GM_LISTINGS_URL, last_listings_time,
                                                                             "listing", "Offered", [], None)
+                logger.info(f"Listings to send: {len(listings)}")
                 for listing in listings[::-1]:
                     await bot.send_message(CHANNEL_ID, listing, parse_mode="HTML", write_timeout=100, read_timeout=100, connect_timeout=100, pool_timeout=100)
-            except:
+            except Exception as err:
                 last_listings_time = int(time.time())
-                print("Error retrieving last listings")
+                logger.error(f"Error retrieving or sending last listings {err}")
             try:
                 offers, last_offers_time = get_gm_events_from_last_time(GM_OFFERS_URL, last_offers_time, "offer",
                                                                         "Offer", [], None)
+                logger.info(f"Offers to send: {len(offers)}")
                 for offer in offers[::-1]:
                     await bot.send_message(CHANNEL_ID, offer, parse_mode="HTML", write_timeout=100, read_timeout=100, connect_timeout=100, pool_timeout=100)
-            except:
+            except Exception as err:
                 last_offers_time = int(time.time())
-                print("Error retrieving last offers")
+                logger.error(f"Error retrieving last offers {err}")
             try:
                 bids, last_bids_time = get_gm_events_from_last_time(GM_BIDS_URL, last_bids_time, "bid", "Bid", [], None)
+                logger.info(f"Bids to send: {len(bids)}")
                 for bid in bids[::-1]:
                     await bot.send_message(CHANNEL_ID, bid, parse_mode="HTML", write_timeout=100, read_timeout=100, connect_timeout=100, pool_timeout=100)
-            except:
+            except Exception as err:
                 last_bids_time = int(time.time())
-                print("Error retrieving last bids")
-            time.sleep(10)
+                logger.error(err, "Error retrieving or sending last bids")
+            timeout_sleep_secs = 10
+            logger.info(f"Going sleep for {timeout_sleep_secs} secs...")
+            time.sleep(timeout_sleep_secs)
 
 
 if __name__ == "__main__":
