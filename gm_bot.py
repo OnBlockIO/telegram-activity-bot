@@ -127,7 +127,7 @@ def get_gm_events_from_last_time(base_url, last_time, event_name, action_name, e
             if len(user) > 20 and user == event['fromAddress']['address']:
                 user = f"{user[:5]}...{user[-5:]}"
         currency = event['quoteContract']['symbol']
-        decimals = DECIMALS_MAPPING.get(currency, 0) if ((currency != "GAS") or (chain_name != "neox")) else 18
+        decimals = DECIMALS_MAPPING.get(currency, 0) if ((currency != "GAS") or (chain_name != "Neo X")) else 18
         price = f"{round(int(event['price']) / 10 ** decimals, 4)}"
         price = price[:-2] if price[-2:] == ".0" else price
         price_usd = round(float(event['localPrice']), 2)
